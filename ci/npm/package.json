@@ -10,7 +10,6 @@
   "author": "UXLand <dev@uxland.es>",
   "license": "ISC",
   "dependencies": {
-    "@actions/core": "^1.1.0",
-    "npm": "^6.11.3"
+    "@actions/core": "^1.1.0"
   }
 }

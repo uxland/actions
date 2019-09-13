@@ -6,5 +6,5 @@ jobs:
     steps:
       - uses: actions/setup-node@v1
       - name: Install
-        run: npm install -g npm@latest
+        run: npm install
       - uses: uxland/actions/ci/npm@master
