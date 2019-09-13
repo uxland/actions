@@ -1,16 +1,16 @@
+const { Toolkit } = require('actions-toolkit');
 const core = require('@actions/core');
-const npm = require('npm');
+const runInstall = require('./lib/run-install');
+const runTest = require('./lib/run-test');
 
-const handleError = error => error && core.setFailed(error);
-
-try {
-  npm.load({}, error => {
+const handleError = error => error && core.setFailed(error.message);
+const run = async tools => {
+  try {
+    await runInstall(tools);
+    await runTest(tools);
+  } catch (error) {
     handleError(error);
-    npm.commands.install([], (error, data) => {
-      handleError(error);
-      npm.commands.test();
-    });
-  });
-} catch (error) {
-  core.setFailed(error.message);
-}
+  }
+};
+
+run(new Toolkit());
