@@ -4,4 +4,4 @@ jobs:
   test_npm_action:
     runs-on: ubuntu-latest
     steps:
-      uses: uxland/actions/npm@v1
+      - uses: uxland/actions/npm@v1
