@@ -21,6 +21,7 @@
   "dependencies": {
     "@actions/core": "^1.1.0",
     "@actions/github": "^1.1.0",
-    "@zeit/ncc": "^0.20.5"
+    "@zeit/ncc": "^0.20.5",
+    "npm": "^6.11.3"
   }
 }
