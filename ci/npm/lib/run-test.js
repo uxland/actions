@@ -1,7 +1,6 @@
 module.exports = async tools => {
   try {
-    const result = await tools.runInWorkspace('npm', ['test']);
-    console.log(result);
+    await tools.runInWorkspace('npm', ['test'], { stdio: [0, 1, 2] });
   } catch (err) {
     throw err;
   }

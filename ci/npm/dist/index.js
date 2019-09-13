@@ -3835,8 +3835,7 @@ function paginatePlugin (octokit) {
 
 module.exports = async tools => {
   try {
-    const result = await tools.runInWorkspace('npm', ['test']);
-    console.log(result);
+    await tools.runInWorkspace('npm', ['test']);
   } catch (err) {
     throw err;
   }
@@ -19743,8 +19742,7 @@ module.exports = function (x) {
 
 module.exports = async tools => {
   try {
-    const result = await tools.runInWorkspace('npm', ['install']);
-    console.log(result);
+    await tools.runInWorkspace('npm', ['install'], { stdio: [0, 1, 2] });
   } catch (err) {
     throw err;
   }
