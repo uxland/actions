@@ -1,8 +1,0 @@
-on: [push]
-
-jobs:
-  install-n-test:
-    runs-on: ubuntu-latest
-    name: Install and test
-    steps:
-      - uses: uxland/actions/ci/npm@master
