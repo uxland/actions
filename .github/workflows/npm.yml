@@ -5,5 +5,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v1
-      run: npm install
-      - uses: uxland/actions/ci/npm@master
+        run: npm install
+        uses: uxland/actions/ci/npm@master
