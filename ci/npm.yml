@@ -1,0 +1,6 @@
+name: NPM CI
+author: UXLAND
+description: Install and test
+runs:
+  using: 'node12'
+  main: 'lib/npm.js'
