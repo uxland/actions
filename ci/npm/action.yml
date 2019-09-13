@@ -1,6 +1,5 @@
-name: NPM CI
-author: UXLAND
-description: Install and test
+name: 'NPM CI'
+description: 'Installs and runs tests'
 runs:
   using: 'node12'
-  main: 'action.js'
+  main: 'index.js'
