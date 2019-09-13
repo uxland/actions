@@ -1,10 +1,9 @@
 const core = require('@actions/core');
-const npmInstall = require('npm/lib/install');
-const npmTest = require('npm/lib/test');
+const npm = require('npm');
 
 try {
-  npmInstall();
-  npmTest();
+  npm.commands.install();
+  npm.commands.test();
 } catch (error) {
   core.setFailed(error.message);
 }
