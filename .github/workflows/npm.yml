@@ -4,7 +4,9 @@ jobs:
   test_npm_action:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v1
       - name: Install
+        uses: actions/setup-node@v1
         run: npm install
       - uses: uxland/actions/ci/npm@master
