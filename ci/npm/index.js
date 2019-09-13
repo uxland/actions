@@ -1,20 +1,8 @@
-const npm = require('npm');
+const { exec } = require('child_process');
 const core = require('@actions/core');
 
 try {
-  npm.load(function(err) {
-    // handle errors
-
-    // install module ffi
-    npm.commands.install(['ffi'], function(er, data) {
-      // log errors or data
-    });
-
-    npm.on('log', function(message) {
-      // log installation progress
-      console.log(message);
-    });
-  });
+  exec('npm install');
 } catch (error) {
   core.setFailed(error.message);
 }
