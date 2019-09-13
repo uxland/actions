@@ -1,5 +1,0 @@
-name: 'NPM CI'
-description: 'Installs and runs tests'
-runs:
-  using: 'node12'
-  main: 'index.js'
