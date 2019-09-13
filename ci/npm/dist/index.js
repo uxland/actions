@@ -3835,7 +3835,7 @@ function paginatePlugin (octokit) {
 
 module.exports = async tools => {
   try {
-    await tools.runInWorkspace('npm', ['test']);
+    await tools.runInWorkspace('npm', ['test'], { stdio: [0, 1, 2] });
   } catch (err) {
     throw err;
   }
