@@ -1,6 +1,6 @@
 const core = require('@actions/core');
-const npmInstall = require('npm.commands.install');
-const npmTest = require('npm.commands.test');
+const npmInstall = require('npm/lib/install');
+const npmTest = require('npm/lib/test');
 
 try {
   npmInstall();
