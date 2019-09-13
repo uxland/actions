@@ -7,5 +7,4 @@ jobs:
       - uses: actions/setup-node@v1
       - name: Install
         run: npm install
-      - name: Load action
         uses: uxland/actions/ci/npm@master
