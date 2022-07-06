@@ -1,0 +1,40 @@
+name: 'Deploy to Azure Websites'
+description: 'Deploy static files to Azure Websites through SFTP'
+inputs:
+  sftp_username:
+    description: 'SFTP username'
+    required: true
+  sftp_password:
+    description: 'SFTP password'
+    required: true
+  sftp_host:
+    description: 'SFTP host'
+    required: true
+  local_path:
+    description: 'Local path to upload'
+    required: true
+  website_url:
+    description: 'Public website URL'
+    required: false
+    default: ''
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        sudo apt-get install --yes --no-install-recommends lftp
+
+        # Create a dummy web.config if none is available
+        [ -f ${{ inputs.local_path }}/web.config ] || echo '<?xml version="1.0" encoding="utf-8"?><configuration />' > ${{ inputs.local_path }}/web.config
+
+        lftp <<EOF
+        set cmd:fail-exit yes
+        open ftps://${{ inputs.sftp_username }}:${{ inputs.sftp_password }}@${{ inputs.sftp_host }}
+        cd /site/wwwroot
+        lcd ${{ inputs.local_path }}
+        mirror --continue --delete --verbose --reverse --no-perms --exclude=hostingstart.html . .
+        # If web.config needs to be the last modified file to work properly
+        put web.config
+        EOF
+
+        [ -n ${{ inputs.website.url }} ] && echo "***Uploaded to ${{ inputs.website_url }}"
+      shell: bash
