@@ -1,0 +1,25 @@
+---
+
+name: 'Update version using `lerna version`'
+description: 'Update version using `lerna version`'
+runs:
+  using: "composite"
+  steps:
+    - name: Update version
+      run: |
+        git config --global user.email "dev@uxland.es"
+        git config --global user.name "UXLand Developers"
+
+        VERSION_LERNA=$(node -p -e "require('./package.json').devDependencies.lerna")
+
+        # (This will bump versions in package.json files, commit them, AND push them
+        # NOTE: We add a '[skip ci]' suffix to avoid the action re-triggering itself, as we use a custom token
+        # See https://github.blog/changelog/2021-02-08-github-actions-skip-pull-request-and-push-workflows-with-skip-ci/
+        npx lerna@"$VERSION_LERNA" version --conventional-commits  -m "chore(release): publish %s [skip ci]" --yes
+      shell: bash
+
+    - name: Push to default branch
+      run: |
+        git push origin HEAD:"${{ github.event.repository.default_branch }}" || echo \
+          "WARNING: Could not automatically push ${GITHUB_REF} to the default branch, merge it manually" >&2
+      shell: bash
