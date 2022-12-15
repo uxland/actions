@@ -30,7 +30,9 @@ jobs:
     needs: get-version
     runs-on: [self-hosted, '${{inputs.environment}}']
     steps:
-      - uses: ./.github/actions/deploy-with-docker-compose
+      # FIXME: Don't use the action in the master branch, but rather in the same ref. Doesn't seem to be possible:
+      # https://web.archive.org/web/20220711004255/https://github.community/t/ref-head-in-reusable-workflows/203690
+      - uses: uxland/actions/.github/actions/deploy-with-docker-compose@master
         with:
           image_name: '${{inputs.image_name}}'
           version: '${{inputs.version}}'

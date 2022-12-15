@@ -73,7 +73,9 @@ jobs:
         with:
           ref: ${{ github.ref }} # FIXME: We do this to get the newest commit after "Update version", but this is racy
 
-      - uses: ./.github/actions/deploy-with-docker-compose
+      # FIXME: Don't use the action in the master branch, but rather in the same ref. Doesn't seem to be possible:
+      # https://web.archive.org/web/20220711004255/https://github.community/t/ref-head-in-reusable-workflows/203690
+      - uses: uxland/actions/.github/actions/deploy-with-docker-compose@master
         with:
           image_name: '${{inputs.image_name}}'
           version: '${{needs.build.outputs.version}}'
