@@ -1,0 +1,86 @@
+---
+name: 'Deploy with Docker Compose'
+description: 'Deploy with Docker Compose'
+inputs:
+  image_name:
+    description: 'Full image name to deploy'
+    required: true
+    type: string
+  version:
+    description: 'Image tag to deploy'
+    required: true
+    type: string
+  create_network_name:
+    description: 'Create a network with the given name (to network different Compose projects)'
+    required: false
+    type: string
+  cr_pat:
+    description: 'GitHub Container Registry PAT'
+    required: true
+    type: string
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref }} # FIXME: We do this to get the newest commit after "Update version", but this is racy
+
+    - name: Login to GitHub packages
+      env:
+        CR_PAT: ${{ inputs.cr_pat }}
+      shell: bash
+      run: |
+        echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
+
+    - name: Deploy configuration files
+      shell: bash
+      run: |
+        mkdir -p "$HOME/${{ github.event.repository.name }}"
+
+        if [ ! -f "$HOME/${{ github.event.repository.name }}/env" ]; then
+          echo "'env' file must be deployed manually"
+          exit 1
+        fi
+    - name: Pull images
+      env:
+        VERSION: ${{inputs.version}}
+      shell: bash
+      run: |
+        rm -rf "$HOME/${{ github.event.repository.name }}"/deployment/configs
+        if [ -d deployment/configs ]; then
+          mkdir -p "$HOME/${{ github.event.repository.name }}"/deployment/configs
+          cp -r deployment/configs/* "$HOME/${{ github.event.repository.name }}"/deployment/configs
+        fi
+
+        cp deployment/docker-compose.yml "$HOME/${{ github.event.repository.name }}"/docker-compose.yml
+        sed -i \
+          -e "s|${{inputs.image_name}}:latest|${{inputs.image_name}}:$VERSION|g" \
+          -e "/^\s*build:/,+2d" \
+          "$HOME/${{ github.event.repository.name }}"/docker-compose.yml
+        docker-compose \
+          -f "$HOME/${{ github.event.repository.name }}/docker-compose.yml" \
+          pull --quiet
+
+    - name: Stop running containers
+      shell: bash
+      run: |
+        docker-compose \
+          -f "$HOME/${{ github.event.repository.name }}/docker-compose.yml" \
+          down --remove-orphans
+
+    - name: Create cross-project network
+      if: ${{ inputs.create_network_name != '' }}
+      shell: bash
+      run: |
+        docker network inspect "${{ inputs.create_network_name }}" >/dev/null 2>/dev/null || \
+          docker network create --driver bridge "${{ inputs.create_network_name }}"
+
+    - name: Deploy new containers
+      shell: bash
+      run: |
+        docker-compose \
+          -f "$HOME/${{ github.event.repository.name }}/docker-compose.yml" \
+          --env-file "$HOME/${{ github.event.repository.name }}/env" \
+          up --detach
