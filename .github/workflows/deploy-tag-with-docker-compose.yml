@@ -1,0 +1,38 @@
+---
+name: Deploy tag with Docker Compose
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment to deploy in (GitHub Actions self-hosted runner tag)'
+        required: true
+        type: string
+      image_name:
+        description: 'Full image name to deploy'
+        required: true
+        type: string
+      version:
+        description: 'Image tag to deploy'
+        required: true
+        type: string
+      create_network_name:
+        description: 'Create a network with the given name (to network different Compose projects)'
+        required: false
+        type: string
+    secrets:
+      cr_pat:
+        description: 'GitHub Container Registry PAT'
+        required: true
+
+jobs:
+  deployment:
+    needs: get-version
+    runs-on: [self-hosted, '${{inputs.environment}}']
+    steps:
+      - uses: ./.github/actions/deploy-with-docker-compose
+        with:
+          image_name: '${{inputs.image_name}}'
+          version: '${{inputs.version}}'
+          create_network_name: '${{inputs.create_network_name}}'
+          cr_pat: '${{secrets.cr_pat}}'
