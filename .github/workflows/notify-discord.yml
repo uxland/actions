@@ -1,0 +1,29 @@
+---
+name: Notify deployment on Discord
+
+on:
+  workflow_call:
+    secrets:
+      discord_webhook:
+        description: 'Discord WebHook full URL'
+        required: true
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify success
+        uses: Ilshidur/action-discord@0.3.2
+        if: success()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.discord_webhook }}
+        with:
+          args: '✅ Deployment of {{ EVENT_PAYLOAD.repository.full_name }} to {{ GITHUB_REF_NAME }} successful'
+
+      - name: Notify failure
+        uses: Ilshidur/action-discord@0.3.2
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.discord_webhook }}
+        with:
+          args: '❌ Deployment of {{ EVENT_PAYLOAD.repository.full_name }} to {{ GITHUB_REF_NAME }} failed'
