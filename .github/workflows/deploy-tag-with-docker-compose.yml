@@ -27,7 +27,6 @@ on:
 
 jobs:
   deployment:
-    needs: get-version
     runs-on: [self-hosted, '${{inputs.environment}}']
     steps:
       # FIXME: Don't use the action in the master branch, but rather in the same ref. Doesn't seem to be possible:
