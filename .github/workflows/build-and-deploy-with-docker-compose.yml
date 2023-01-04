@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: ${{ github.ref }} # FIXME: We do this to get the newest commit after "Update version", but this is racy
+          ref: ${{ github.ref }}  # FIXME: We do this to get the newest commit after "Update version", but this is racy
 
       - id: get-version
         name: Get version from lerna.json
@@ -71,7 +71,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }} # FIXME: We do this to get the newest commit after "Update version", but this is racy
+          ref: ${{ github.ref }}  # FIXME: We do this to get the newest commit after "Update version", but this is racy
 
       # FIXME: Don't use the action in the master branch, but rather in the same ref. Doesn't seem to be possible:
       # https://web.archive.org/web/20220711004255/https://github.community/t/ref-head-in-reusable-workflows/203690

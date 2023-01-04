@@ -1,3 +1,5 @@
+---
+
 name: 'Deploy to Azure Websites'
 description: 'Deploy static files to Azure Websites through SFTP'
 inputs:
