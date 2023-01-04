@@ -61,8 +61,8 @@ runs:
           mkdir -p "$HOME/${{ github.event.repository.name }}"
 
           # Convert from JSON {"KEY1": "VALUE1", "KEY2": "VALUE2", ...} to a KEY1=VALUE1 KEY2=VALUE2 ... array
-          readarray -t ENVVARS < <(echo "$ENVIRONMENT_SECRETS_CONTEXT" | \
-            docker run -i docker.io/stedolan/jq -r 'to_entries[] | "\(.key)=\(.value)"')
+          readarray -d '' ENVVARS < <(echo "$ENVIRONMENT_SECRETS_CONTEXT" | \
+            docker run -i docker.io/stedolan/jq -j 'to_entries[] | "\(.key)=\(.value)\u0000"')
           # Replace environment variables in env file using envsubst
           env -i "${ENVVARS[@]}" envsubst <"deployment/env.${{ inputs.environment }}" >"$HOME/${{ github.event.repository.name }}/env"
 
