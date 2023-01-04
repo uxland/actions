@@ -60,13 +60,11 @@ runs:
       run: |
           mkdir -p "$HOME/${{ github.event.repository.name }}"
 
-          # Convert from JSON to TSV (KEY1<TAB>VALUE1<NL>KEY2<TAB>VALUE2<NL>KEY3<TAB>VALUE3<NL>...)
-          echo "$ENVIRONMENT_SECRETS_CONTEXT" | docker run -i docker.io/stedolan/jq -r '. | to_entries | .[] | [.key, .value] | @tsv' >tmp.tsv
-          trap "shred -u tmp.tsv" EXIT
-          # Build KEY1=VALUE1 KEY2=VALUE2 KEY3=VALUE3 ... array
-          set -- && while IFS=$'\t' read -r key value; do set -- "$@" "$key"="$value"; done <tmp.tsv
+          # Convert from JSON {"KEY1": "VALUE1", "KEY2": "VALUE2", ...} to a KEY1=VALUE1 KEY2=VALUE2 ... array
+          readarray -t ENVVARS < <(echo "$ENVIRONMENT_SECRETS_CONTEXT" | \
+            docker run -i docker.io/stedolan/jq -r 'to_entries[] | "\(.key)=\(.value)"')
           # Replace environment variables in env file using envsubst
-          env -i "$@" envsubst <"deployment/env.${{ inputs.environment }}" >"$HOME/${{ github.event.repository.name }}/env"
+          env -i "${ENVVARS[@]}" envsubst <"deployment/env.${{ inputs.environment }}" >"$HOME/${{ github.event.repository.name }}/env"
 
     - name: Pull images
       env:
