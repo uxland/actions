@@ -24,6 +24,10 @@ on:
       cr_pat:
         description: 'GitHub Container Registry PAT'
         required: true
+      environment_secrets_context:
+        # See: https://stackoverflow.com/questions/68008181/how-do-i-get-all-github-secrets-into-env-variables-for-actions-to-access-powers
+        description: 'Environment secrets context JSON (e.g. toJson(secrets))'
+        required: false
 
 jobs:
   build:
@@ -66,6 +70,7 @@ jobs:
 
   deployment:
     needs: build
+    environment: '${{inputs.environment}}'
     runs-on: [self-hosted, '${{inputs.environment}}']
     steps:
       - name: Checkout
@@ -81,6 +86,8 @@ jobs:
           version: '${{needs.build.outputs.version}}'
           create_network_name: '${{inputs.create_network_name}}'
           cr_pat: '${{secrets.cr_pat}}'
+          environment: '${{inputs.environment}}'
+          environment_secrets_context: '${{secrets.environment_secrets_context}}'
 
       - name: Delete old Docker images
         if: ${{ inputs.prune_old_images == true }}

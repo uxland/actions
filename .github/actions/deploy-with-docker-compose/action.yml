@@ -18,6 +18,15 @@ inputs:
     description: 'GitHub Container Registry PAT'
     required: true
     type: string
+  environment:
+    description: 'Environment to deploy in (GitHub Actions self-hosted runner tag)'
+    required: false
+    type: string
+  environment_secrets_context:
+    # See: https://stackoverflow.com/questions/68008181/how-do-i-get-all-github-secrets-into-env-variables-for-actions-to-access-powers
+    description: 'Environment secrets context JSON (e.g. toJson(secrets))'
+    required: false
+    type: string
 
 runs:
   using: 'composite'
@@ -34,15 +43,31 @@ runs:
       run: |
         echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
 
-    - name: Deploy configuration files
+    - name: Verify environment file
+      if: ${{ inputs.environment == '' || inputs.environment_secrets_context == '' }}
       shell: bash
       run: |
-        mkdir -p "$HOME/${{ github.event.repository.name }}"
-
         if [ ! -f "$HOME/${{ github.event.repository.name }}/env" ]; then
           echo "'env' file must be deployed manually"
           exit 1
         fi
+
+    - name: Deploy environment file
+      if: ${{ inputs.environment != '' && inputs.environment_secrets_context != '' }}
+      shell: bash
+      env:
+        ENVIRONMENT_SECRETS_CONTEXT: ${{ inputs.environment_secrets_context }}
+      run: |
+          mkdir -p "$HOME/${{ github.event.repository.name }}"
+
+          # Convert from JSON to TSV (KEY1<TAB>VALUE1<NL>KEY2<TAB>VALUE2<NL>KEY3<TAB>VALUE3<NL>...)
+          echo "$ENVIRONMENT_SECRETS_CONTEXT" | docker run -i docker.io/stedolan/jq -r '. | to_entries | .[] | [.key, .value] | @tsv' >tmp.tsv
+          trap "shred -u tmp.tsv" EXIT
+          # Build KEY1=VALUE1 KEY2=VALUE2 KEY3=VALUE3 ... array
+          set -- && while IFS=$'\t' read -r key value; do set -- "$@" "$key"="$value"; done <tmp.tsv
+          # Replace environment variables in env file using envsubst
+          env -i "$@" envsubst <"deployment/env.${{ inputs.environment }}" >"$HOME/${{ github.event.repository.name }}/env"
+
     - name: Pull images
       env:
         VERSION: ${{inputs.version}}
