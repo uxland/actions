@@ -9,6 +9,11 @@ on:
         required: false
         default: 'Deployment'
         type: string
+      is_success:
+        description: 'Whether to notify success or failure'
+        required: false # FIXME: Migrate all jobs and make required
+        default: true
+        type: boolean
     secrets:
       discord_webhook:
         description: 'Discord WebHook full URL'
@@ -20,7 +25,7 @@ jobs:
     steps:
       - name: Notify success
         uses: Ilshidur/action-discord@0.3.2
-        if: success()
+        if: ${{ inputs.is_success == true }}
         env:
           DISCORD_WEBHOOK: ${{ secrets.discord_webhook }}
           EVENT_NAME: ${{ inputs.event_name }}
@@ -29,7 +34,7 @@ jobs:
 
       - name: Notify failure
         uses: Ilshidur/action-discord@0.3.2
-        if: failure()
+        if: ${{ inputs.is_success == false }}
         env:
           DISCORD_WEBHOOK: ${{ secrets.discord_webhook }}
           EVENT_NAME: ${{ inputs.event_name }}
