@@ -16,8 +16,7 @@ on:
         type: string
       is_success:
         description: 'Whether to notify success or failure'
-        required: false # FIXME: Migrate all jobs and make required
-        default: true
+        required: true
         type: boolean
     secrets:
       discord_webhook:
