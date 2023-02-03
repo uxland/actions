@@ -9,6 +9,11 @@ on:
         required: false
         default: 'Deployment'
         type: string
+      environment_name:
+        description: 'Name of the environment for which to notify the event'
+        required: false
+        default: ${{ github.ref_name }}
+        type: string
       is_success:
         description: 'Whether to notify success or failure'
         required: false # FIXME: Migrate all jobs and make required
@@ -29,8 +34,9 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.discord_webhook }}
           EVENT_NAME: ${{ inputs.event_name }}
+          ENVIRONMENT_NAME: ${{ inputs.environment_name }}
         with:
-          args: '✅ {{ EVENT_NAME }} of {{ EVENT_PAYLOAD.repository.full_name }} to {{ GITHUB_REF_NAME }} successful'
+          args: '✅ {{ EVENT_NAME }} of {{ EVENT_PAYLOAD.repository.full_name }} to {{ ENVIRONMENT_NAME }} successful'
 
       - name: Notify failure
         uses: Ilshidur/action-discord@0.3.2
@@ -38,5 +44,6 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.discord_webhook }}
           EVENT_NAME: ${{ inputs.event_name }}
+          ENVIRONMENT_NAME: ${{ inputs.environment_name }}
         with:
-          args: '❌ {{ EVENT_NAME }} of {{ EVENT_PAYLOAD.repository.full_name }} to {{ GITHUB_REF_NAME }} failed'
+          args: '❌ {{ EVENT_NAME }} of {{ EVENT_PAYLOAD.repository.full_name }} to {{ ENVIRONMENT_NAME }} failed'
