@@ -3,6 +3,12 @@ name: Notify deployment on Discord
 
 on:
   workflow_call:
+    inputs:
+      event_name:
+        description: 'Kind of event to notify (e.g. Deployment, Push, etc.)'
+        required: false
+        default: 'Deployment'
+        type: string
     secrets:
       discord_webhook:
         description: 'Discord WebHook full URL'
@@ -17,13 +23,15 @@ jobs:
         if: success()
         env:
           DISCORD_WEBHOOK: ${{ secrets.discord_webhook }}
+          EVENT_NAME: ${{ inputs.event_name }}
         with:
-          args: '✅ Deployment of {{ EVENT_PAYLOAD.repository.full_name }} to {{ GITHUB_REF_NAME }} successful'
+          args: '✅ {{ EVENT_NAME }} of {{ EVENT_PAYLOAD.repository.full_name }} to {{ GITHUB_REF_NAME }} successful'
 
       - name: Notify failure
         uses: Ilshidur/action-discord@0.3.2
         if: failure()
         env:
           DISCORD_WEBHOOK: ${{ secrets.discord_webhook }}
+          EVENT_NAME: ${{ inputs.event_name }}
         with:
-          args: '❌ Deployment of {{ EVENT_PAYLOAD.repository.full_name }} to {{ GITHUB_REF_NAME }} failed'
+          args: '❌ {{ EVENT_NAME }} of {{ EVENT_PAYLOAD.repository.full_name }} to {{ GITHUB_REF_NAME }} failed'
