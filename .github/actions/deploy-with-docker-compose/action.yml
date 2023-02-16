@@ -84,7 +84,7 @@ runs:
           "$HOME/${{ github.event.repository.name }}"/docker-compose.yml
         docker-compose \
           -f "$HOME/${{ github.event.repository.name }}/docker-compose.yml" \
-          pull --quiet
+          pull
 
     - name: Stop running containers
       shell: bash
