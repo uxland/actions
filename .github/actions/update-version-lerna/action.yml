@@ -15,7 +15,9 @@ runs:
         # (This will bump versions in package.json files, commit them, AND push them
         # NOTE: We add a '[skip ci]' suffix to avoid the action re-triggering itself, as we use a custom token
         # See https://github.blog/changelog/2021-02-08-github-actions-skip-pull-request-and-push-workflows-with-skip-ci/
-        npx lerna@"$VERSION_LERNA" version --conventional-commits  -m "chore(release): publish %s [skip ci]" --yes
+        # NOTE: --ignore-merged-tags helps us avoid generating a new version when merging a PR without changes.
+        # See: https://github.com/lerna/lerna/issues/1377, https://github.com/lerna/lerna/issues/3033
+        npx lerna@"$VERSION_LERNA" version --conventional-commits -m "chore(release): publish %s [skip ci]" --ignore-merged-tags --yes
       shell: bash
 
     - name: Push to default branch
