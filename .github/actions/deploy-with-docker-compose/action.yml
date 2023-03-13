@@ -78,10 +78,14 @@ runs:
         fi
 
         cp deployment/docker-compose.yml "$HOME/${{ github.event.repository.name }}"/docker-compose.yml
-        sed -i \
-          -e "s|${{inputs.image_name}}:latest|${{inputs.image_name}}:$VERSION|g" \
-          -e "/^\s*build:/,+2d" \
-          "$HOME/${{ github.event.repository.name }}"/docker-compose.yml
+
+        # Create definitive docker-compose.yml file (using yq) by (1) removing the "build:" key and (2) setting the image tag with the appropriate version
+        docker run --rm -i --network none -e IMAGE_NAME="${{inputs.image_name}}" -e VERSION="$VERSION" docker.io/mikefarah/yq:4.31.2 \
+          '.services[] |= (select(.image | test("^" + env(IMAGE_NAME))) | del(.build) | .image = env(IMAGE_NAME) + ":" + env(VERSION))' \
+          <"$HOME/${{ github.event.repository.name }}"/docker-compose.yml \
+          >"$HOME/${{ github.event.repository.name }}"/docker-compose.yml.tmp
+        mv "$HOME/${{ github.event.repository.name }}"/docker-compose.yml.tmp "$HOME/${{ github.event.repository.name }}"/docker-compose.yml
+
         docker-compose \
           -f "$HOME/${{ github.event.repository.name }}/docker-compose.yml" \
           pull
