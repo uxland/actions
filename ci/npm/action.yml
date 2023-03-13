@@ -1,5 +1,0 @@
-name: 'npm Install and Test'
-description: 'Runs npm install and npm test'
-runs:
-  using: 'node12'
-  main: 'dist/index.js'
