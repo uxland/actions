@@ -62,7 +62,7 @@ runs:
 
           # Convert from JSON {"KEY1": "VALUE1", "KEY2": "VALUE2", ...} to a KEY1=VALUE1 KEY2=VALUE2 ... array
           readarray -d '' ENVVARS < <(echo "$ENVIRONMENT_SECRETS_CONTEXT" | \
-            docker run --rm -i --network none docker.io/stedolan/jq@sha256:a61ed0bca213081b64be94c5e1b402ea58bc549f457c2682a86704dd55231e09 -j 'to_entries[] | "\(.key)=\(.value)\u0000"')
+            docker run --rm -i --network none --entrypoint jq docker.io/linuxserver/yq:3.1.1 -j 'to_entries[] | "\(.key)=\(.value)\u0000"')
           # Replace environment variables in env file using envsubst
           env -i "${ENVVARS[@]}" envsubst <"deployment/env.${{ inputs.environment }}" >"$HOME/${{ github.event.repository.name }}/env"
 
