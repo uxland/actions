@@ -10,7 +10,8 @@ runs:
         git config --global user.email "dev@uxland.es"
         git config --global user.name "UXLand Developers"
 
-        VERSION_LERNA=$(node -p -e "require('./package.json').devDependencies.lerna")
+        # FIXME: This should use the version from the lock file and not the package.json
+        VERSION_LERNA=$(node -p -e "pj=require('./package.json'); pj.devDependencies.lerna || pj.dependencies.lerna")
 
         # (This will bump versions in package.json files, commit them, AND push them
         # NOTE: We add a '[skip ci]' suffix to avoid the action re-triggering itself, as we use a custom token
