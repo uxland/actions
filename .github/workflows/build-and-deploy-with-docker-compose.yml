@@ -79,7 +79,7 @@ jobs:
       - name: Generate build artifacts
         if: ${{ inputs.build_artifacts_name != '' && inputs.build_artifacts_path != '' }}
         run: |
-          docker buildx build . -f deployment/Dockerfile --target builder --tag artifacts-tmp-image --load
+          docker buildx build . --cache-from type=gha --file deployment/Dockerfile --target builder --tag artifacts-tmp-image --load
           docker create --name artifacts-tmp-container artifacts-tmp-image
           docker cp artifacts-tmp-container:"${{inputs.build_artifacts_path}}" build-artifacts
           docker rm --force --volumes artifacts-tmp-container
