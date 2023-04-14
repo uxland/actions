@@ -20,6 +20,14 @@ on:
         description: Prune old images
         type: boolean
         default: true
+      build_artifacts_name:
+        description: Name of the build artifact to create
+        required: false
+        type: string
+      build_artifacts_path:
+        description: Path of the build artifacts inside the 'builder' Docker target
+        required: false
+        type: string
     secrets:
       cr_pat:
         description: 'GitHub Container Registry PAT'
@@ -67,6 +75,22 @@ jobs:
           file: deployment/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Generate build artifacts
+        if: ${{ inputs.build_artifacts_name != '' && inputs.build_artifacts_path != '' }}
+        run: |
+          docker build . -f deployment/Dockerfile --target builder --tag artifacts-tmp-image
+          docker create --name artifacts-tmp-container artifacts-tmp-image
+          docker cp artifacts-tmp-container:"${{inputs.build_artifacts_path}}" build-artifacts
+          docker rm --force --volumes artifacts-tmp-container
+          docker rmi --force artifacts-tmp-image
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ inputs.build_artifacts_name != '' && inputs.build_artifacts_path != '' }}
+        with:
+          name: ${{inputs.build_artifacts_name}}
+          path: build-artifacts
 
   deployment:
     needs: build
