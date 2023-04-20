@@ -27,7 +27,7 @@ on:
       environment_secrets_context:
         # See: https://stackoverflow.com/questions/68008181/how-do-i-get-all-github-secrets-into-env-variables-for-actions-to-access-powers
         description: 'Environment secrets context JSON (e.g. toJson(secrets))'
-        required: false
+        required: true
 
 jobs:
   deployment:

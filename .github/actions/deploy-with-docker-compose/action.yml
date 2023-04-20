@@ -20,12 +20,12 @@ inputs:
     type: string
   environment:
     description: 'Environment to deploy in (GitHub Actions self-hosted runner tag)'
-    required: false
+    required: true
     type: string
   environment_secrets_context:
     # See: https://stackoverflow.com/questions/68008181/how-do-i-get-all-github-secrets-into-env-variables-for-actions-to-access-powers
     description: 'Environment secrets context JSON (e.g. toJson(secrets))'
-    required: false
+    required: true
     type: string
 
 runs:
@@ -43,17 +43,7 @@ runs:
       run: |
         echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
 
-    - name: Verify environment file
-      if: ${{ inputs.environment == '' || inputs.environment_secrets_context == '' }}
-      shell: bash
-      run: |
-        if [ ! -f "$HOME/${{ github.event.repository.name }}/env" ]; then
-          echo "'env' file must be deployed manually"
-          exit 1
-        fi
-
     - name: Deploy environment file
-      if: ${{ inputs.environment != '' && inputs.environment_secrets_context != '' }}
       shell: bash
       env:
         ENVIRONMENT_SECRETS_CONTEXT: ${{ inputs.environment_secrets_context }}
