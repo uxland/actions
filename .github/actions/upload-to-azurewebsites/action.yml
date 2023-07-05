@@ -35,7 +35,7 @@ runs:
         lftp <<EOF
         set cmd:fail-exit yes
         open ftps://${{ inputs.sftp_username }}:${{ inputs.sftp_password }}@${{ inputs.sftp_host }}
-        mkdir -p ${{ inputs.host_path}}
+        [ -d ${{ inputs.host_path}} ] || mkdir -p ${{ inputs.host_path}}
         cd ${{ inputs.host_path}}
         lcd ${{ inputs.local_path }}
         mirror --continue --delete --verbose --reverse --no-perms --exclude=hostingstart.html . .
