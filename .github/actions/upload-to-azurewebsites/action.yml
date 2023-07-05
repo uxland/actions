@@ -19,6 +19,10 @@ inputs:
     description: 'Public website URL'
     required: false
     default: ''
+  host_path: 
+    description: 'Stfp path to upload'
+    required: false
+    default: '/site/wwwroot'
 runs:
   using: "composite"
   steps:
@@ -31,7 +35,7 @@ runs:
         lftp <<EOF
         set cmd:fail-exit yes
         open ftps://${{ inputs.sftp_username }}:${{ inputs.sftp_password }}@${{ inputs.sftp_host }}
-        cd /site/wwwroot
+        cd ${{ inputs.host_path}}
         lcd ${{ inputs.local_path }}
         mirror --continue --delete --verbose --reverse --no-perms --exclude=hostingstart.html . .
         # If web.config needs to be the last modified file to work properly
