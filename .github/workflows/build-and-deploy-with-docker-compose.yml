@@ -86,7 +86,7 @@ jobs:
           docker rmi --force artifacts-tmp-image
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ inputs.build_artifacts_name != '' && inputs.build_artifacts_path != '' }}
         with:
           name: ${{inputs.build_artifacts_name}}
